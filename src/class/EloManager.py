@@ -34,6 +34,16 @@ class EloManager:
             return Joueur(*row)
         return None
 
-    def mettre_a_jour_elo(self, joueur: Joueur):
+    def update_elo(self, joueur: Joueur):
         self.cursor.execute("update joueurs SET elo = ? where id = ?", (joueur.elo, joueur.id))
         self.conn.commit()
+
+    def manage_elo(self, gagnant: Joueur, perdant: Joueur, k=32):
+        # ici la logique de l'elo - a changer si besoin
+        proba_gagnant = 1 / (1 + 10 ** ((perdant.elo - gagnant.elo) / 400))
+        proba_perdant = 1 - proba_gagnant
+
+        gagnant.elo += round(k * (1 - proba_gagnant))
+        perdant.elo += round(k * (0 - proba_perdant))
+        self.update_elo(gagnant)
+        self.update_elo(perdant)
