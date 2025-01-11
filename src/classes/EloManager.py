@@ -1,11 +1,11 @@
 import sqlite3
-from Joueur import Joueur
+from classes.Joueur import Joueur
 
 
 class EloManager:
-    def __init__(self, db_path="../db/elo_database.db"):
+    def __init__(self, db_path="db/elo_database.db"):
         self.conn=sqlite3.connect(db_path)
-        self.cursor=self.conn.cursor
+        self.cursor=self.conn.cursor()
         self._create_table()
 
 
