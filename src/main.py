@@ -43,13 +43,8 @@ async def info_joueur(ctx, nom: str):
 
 """déclaration de match"""
 @bot.command(name="match")
-async def declarer_match(ctx, gagnant_nom: str, perdant_nom: str):
-    gagnant = elo_manager.obtenir_joueur(gagnant_nom)
-    perdant = elo_manager.obtenir_joueur(perdant_nom)
-
-    if not gagnant or not perdant:
-        await ctx.send("L'un des joueurs spécifiés n'existe pas. Utilisez `?ajouter` pour les ajouter.")
-        return
+async def declarer_match():
+    return
 
 
 

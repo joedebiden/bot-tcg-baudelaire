@@ -3,3 +3,11 @@ CREATE TABLE joueurs (
     nom TEXT UNIQUE NOT NULL,
     elo INTEGER NOT NULL DEFAULT 1200
 );
+
+CREATE TABLE IF NOT EXISTS matches (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    joueur1 TEXT NOT NULL,
+    joueur2 TEXT NOT NULL,
+    etat TEXT NOT NULL DEFAULT 'en attente',
+    gagnant TEXT
+);
