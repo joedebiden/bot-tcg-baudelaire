@@ -1,4 +1,4 @@
-from classes.EloManager import EloManager
+from classes.elo_manager import EloManager
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":

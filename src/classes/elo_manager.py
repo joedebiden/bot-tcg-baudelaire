@@ -1,42 +1,42 @@
 import sqlite3
-from classes.Joueur import Joueur
-
+from classes.db_manager import DatabaseManager
+from classes.joueur import Joueur
 
 class EloManager:
-    def __init__(self, db_path="db/elo_database.db"):
-        self.conn=sqlite3.connect(db_path)
-        self.cursor=self.conn.cursor()
+    def __init__(self):
+        self.db = DatabaseManager()
         self._create_table()
 
 
     def _create_table(self):
-        self.cursor.execute("""
+        self.db.execute("""
         CREATE TABLE IF NOT EXISTS joueurs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nom TEXT UNIQUE NOT NULL,
             elo INTEGER NOT NULL DEFAULT 1200
         )
         """)
-        self.conn.commit()
 
     def ajouter_joueur(self, nom, elo=1200):
         try:
-            self.cursor.execute("insert into joueurs (nom, elo) values (?, ?)", (nom, elo))
-            self.conn.commit()
-
+            self.db.execute("insert into joueurs (nom, elo) values (?, ?)", (nom, elo))
         except sqlite3.InternalError:
             print(f"le joueur {nom} existe déjà.")
 
     def obtenir_joueur(self, nom):
-        self.cursor.execute("select * from joueurs where nom = ?", (nom,))
-        row = self.cursor.fetchone()
+        if not nom:
+            raise ValueError("Le nom ne peut pas etre vide")
+
+        requete = "select * from joueurs where nom = ?"
+        row = self.db.fetchone(requete, (nom,))
         if row:
-            return Joueur(*row)
-        return None
+            return Joueur(id=row[0], nom=row[1], elo=row[2])
+        else:
+            return None
 
     def update_elo(self, joueur: Joueur):
-        self.cursor.execute("update joueurs SET elo = ? where id = ?", (joueur.elo, joueur.id))
-        self.conn.commit()
+        self.db.execute("update joueurs SET elo = ? where id = ?", (joueur.elo, joueur.id))
+
 
     def manage_elo(self, gagnant: Joueur, perdant: Joueur, k=32):
         # ici la logique de l'elo - a changer si besoin

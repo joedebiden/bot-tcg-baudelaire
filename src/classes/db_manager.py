@@ -20,6 +20,8 @@ class DatabaseManager:
         return self.cursor.fetchall()
 
     def fetchone(self, query, params=()):
+        if not isinstance(query, str):
+            raise ValueError("La requete sql doit etre une chaine de caracteres valides")
         self.cursor.execute(query, params)
         return self.cursor.fetchone()
 
