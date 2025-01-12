@@ -73,6 +73,30 @@ async def declarer_match(ctx, adversaire: str):
              f"Utilise `.accepte {match_id}` pour accepter le match.")
 
 
+"""Accepter un match"""
+@bot.command(name="accepte")
+async def accepter_match(ctx, match_id: int):
+
+    match.accepter_match(match_id)
+    if not match:
+        await ctx.send("Match non trouvé")
+        return
+
+    etat, joueur1, joueur2 = match
+    if etat != "en attente":
+        await ctx.send("Ce match n'est pas en attente")
+        return
+
+    if ctx.author.name not in (joueur1, joueur2):
+        await ctx.send("Seuls les joueurs concernés peuvent accepter ce match")
+        return
+
+    match.update_match(match_id)
+    await ctx.send(f"Match entre {joueur1} et {joueur2} accepté, que le meilleur gagne!")
+
+
+
+
 
 
 bot.run(BOT_TOKEN)

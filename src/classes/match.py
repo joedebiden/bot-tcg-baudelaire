@@ -20,6 +20,23 @@ class Match:
 
     def ajouter_match(self, joueur1, joueur2):
         try:
-            self.db.execute("insert into matches (joueur1, joueur2) values (? , ?)", (joueur1, joueur2))
+            cursor = self.db.execute("insert into matches (joueur1, joueur2) values (? , ?)", (joueur1, joueur2))
+            print(f"Match entre [{joueur1} & {joueur2}] ajouté avec succes")
+            return cursor.lastrowid
+        except sqlite3.InternalError as e:
+            print(f"Une erreur est survenue: {e}")
+            return None
+
+    def accepter_match(self, match_id):
+        try:
+            self.db.execute("select etat, joueur1, joueur2 FROM matches WHERE id = ?", (match_id,))
+            print(f"Match n°{match_id} accepté avec succes")
+        except sqlite3.InternalError as e:
+            print(f"Une erreur est survenue: {e}")
+
+    def update_match(self, match_id):
+        try:
+            self.db.execute("UPDATE matches SET etat = 'en cours' WHERE id = ?", (match_id,))
+            print(f"Match ")
         except sqlite3.InternalError as e:
             print(f"Une erreur est survenue: {e}")
