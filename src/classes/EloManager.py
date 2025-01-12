@@ -19,7 +19,7 @@ class EloManager:
         """)
         self.conn.commit()
 
-    def ajouter_joueur(self, nom, elo=1000):
+    def ajouter_joueur(self, nom, elo=1200):
         try:
             self.cursor.execute("insert into joueurs (nom, elo) values (?, ?)", (nom, elo))
             self.conn.commit()
