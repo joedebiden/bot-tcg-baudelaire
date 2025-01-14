@@ -60,29 +60,27 @@ async def info_joueur(ctx, nom: str):
 @bot.command(name="match")
 async def declarer_match(ctx, adversaire: str):
     joueur1 = ctx.author.name
-    joueur2 = adversaire
 
-    if not elo_manager.obtenir_joueur(joueur1) or not elo_manager.obtenir_joueur(adversaire):
-        await ctx.send("Un des joueurs mentionné n'est pas enregistré, faites `.ajouter` pour l'enregistrer dans la compet!")
-        return
+    match.ajouter_match(joueur1, adversaire) # permet d'insérer le match dans la base (unique match par joueur)
 
-    match.ajouter_match(joueur1, joueur2)
-    match_id = match.cursor.lastrowid
-
-    ctx.send(f"Le match entre {joueur1} et {joueur2} est en cours d'attente. ID du match pour pouvoir accepter/annuler la demande à tout moment : {match_id}.\n"
-             f"Utilise `.accepte {match_id}` pour accepter le match.")
+    match_id = match.match_id(joueur1)
+    print(f"le match id {match_id}")
+    if match_id:
+        await ctx.send(f"Le match entre {joueur1} et {adversaire} est en cours d'attente. ID du match pour pouvoir accepter/annuler la demande à tout moment : {match_id}.\n"
+             f"Utilise `.accepte {match_id}` pour accepter le match")
+    else:
+        await ctx.send("Erreur lors de la création du match")
 
 
 """Accepter un match"""
-@bot.command(name="accepte")
+@bot.command(name="accepter")
 async def accepter_match(ctx, match_id: int):
-
-    match.accepter_match(match_id)
-    if not match:
+    match_data = match.accepter_match(match_id)
+    if not match_data:
         await ctx.send("Match non trouvé")
         return
 
-    etat, joueur1, joueur2 = match
+    etat, joueur1, joueur2 = match_data
     if etat != "en attente":
         await ctx.send("Ce match n'est pas en attente")
         return

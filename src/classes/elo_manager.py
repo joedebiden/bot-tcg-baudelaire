@@ -34,6 +34,7 @@ class EloManager:
         else:
             return None
 
+
     def update_elo(self, joueur: Joueur):
         self.db.execute("update joueurs SET elo = ? where id = ?", (joueur.elo, joueur.id))
 
