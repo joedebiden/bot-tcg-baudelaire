@@ -19,21 +19,35 @@ class Match:
         """)
 
     def ajouter_match(self, joueur1, joueur2):
+        """
+        créé un match unique pour deux joueurs
+        condiction : aucun des deux joueurs ne peut etre déjà dans un match
+        """
         try:
-            self.db.execute("insert into matches (joueur1, joueur2) values (? , ?)", (joueur1, joueur2))
-            print(f"Match entre [{joueur1} & {joueur2}] ajouté avec succes")
+            result = self.db.fetchall("select * from matches where (joueur1 = ? or joueur2 = ?) and etat in ('en attente', 'en cours')", (joueur1, joueur2))
+            if result:
+                print(f"Echec de la création du match entre [{joueur1} & {joueur2}]")
+                return False
+            else:
+                self.db.execute("insert into matches (joueur1, joueur2) values (? , ?)", (joueur1, joueur2))
+                print(f"Match entre [{joueur1} & {joueur2}] ajouté avec succes")
+                return True
 
         except sqlite3.InternalError as e:
             print(f"Une erreur est survenue: {e}")
+
 
     def match_id(self, joueur1):
         """retourne l'id du match en fonction du joueur (implique un match max par joueur)"""
         try:
             match_id = self.db.fetchone("select id from matches where joueur1 = ?", (joueur1,))
-            return match_id
+            if match_id:
+                print(match_id[0])
+                return match_id[0]
+            return None
         except sqlite3.InternalError as e:
             print(f"Une erreur est survenue: {e}")
-            return
+            return None
 
     def accepter_match(self, match_id):
         try:

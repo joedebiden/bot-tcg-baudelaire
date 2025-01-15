@@ -33,11 +33,12 @@ async def on_close():
 
 
 """gere l'ajout d'un joueur"""
-@bot.command(name="ajouter")
-async def ajouter_joueur(ctx, nom: str):
+@bot.command(name="start")
+async def ajouter_joueur(ctx):
+    joueur = ctx.author.name
     try:
-        elo_manager.ajouter_joueur(nom)
-        await ctx.send(f"Bienvenue {nom} dans l'aventure, tu as 1200 points à toi de monter dans le classement!")
+        elo_manager.ajouter_joueur(joueur)
+        await ctx.send(f"Bienvenue {joueur} dans l'aventure, tu as 1200 points à toi de monter dans le classement!")
     except ValueError as e:
         await ctx.send(str(e))
 
@@ -61,15 +62,19 @@ async def info_joueur(ctx, nom: str):
 async def declarer_match(ctx, adversaire: str):
     joueur1 = ctx.author.name
 
-    match.ajouter_match(joueur1, adversaire) # permet d'insérer le match dans la base (unique match par joueur)
+    game = match.ajouter_match(joueur1, adversaire) # permet d'insérer le match dans la base (unique match par joueur)
+    if game == False:
+        await ctx.send("Un des deux joueurs participe déjà dans un match")
+        return
+    elif game == True:
+        match_id = match.match_id(joueur1)
+        await ctx.send(f"Le match entre {joueur1} et {adversaire} est en cours d'attente.\n"
+                       f"ID du match pour pouvoir accepter/annuler la demande à tout moment : `{match_id}`\n"
+                       f"Utilise `.accepte {match_id}` pour accepter le match\n"
+                       f"Et `.refuser {match_id}` pour décliner la demande")
 
-    match_id = match.match_id(joueur1)
-    print(f"le match id {match_id}")
-    if match_id:
-        await ctx.send(f"Le match entre {joueur1} et {adversaire} est en cours d'attente. ID du match pour pouvoir accepter/annuler la demande à tout moment : {match_id}.\n"
-             f"Utilise `.accepte {match_id}` pour accepter le match")
     else:
-        await ctx.send("Erreur lors de la création du match")
+        await ctx.send("Une erreur est survenue lors de la création du match")
 
 
 """Accepter un match"""
