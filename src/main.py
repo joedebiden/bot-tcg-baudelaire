@@ -70,36 +70,43 @@ async def declarer_match(ctx, adversaire: str):
         match_id = match.match_id(joueur1)
         await ctx.send(f"Le match entre {joueur1} et {adversaire} est en cours d'attente.\n"
                        f"ID du match pour pouvoir accepter/annuler la demande à tout moment : `{match_id}`\n"
-                       f"Utilise `.accepte {match_id}` pour accepter le match\n"
+                       f"Utilise `.accepter {match_id}` pour accepter le match\n"
                        f"Et `.refuser {match_id}` pour décliner la demande")
 
     else:
         await ctx.send("Une erreur est survenue lors de la création du match")
 
 
-"""Accepter un match"""
 @bot.command(name="accepter")
 async def accepter_match(ctx, match_id: int):
-    match_data = match.accepter_match(match_id)
-    if not match_data:
-        await ctx.send("Match non trouvé")
+    result = match.accepter_match(match_id)
+
+    if result is None:
+        await ctx.send("Match non trouvé.")
         return
 
-    etat, joueur1, joueur2 = match_data
-    if etat != "en attente":
-        await ctx.send("Ce match n'est pas en attente")
-        return
+    etat, joueur1, joueur2 = result[1:] if isinstance(result, tuple) else (None, None, None)
 
-    if ctx.author.name not in (joueur1, joueur2):
-        await ctx.send("Seuls les joueurs concernés peuvent accepter ce match")
-        return
-
-    match.update_match(match_id)
-    await ctx.send(f"Match entre {joueur1} et {joueur2} accepté, que le meilleur gagne!")
-
+    if result[0] == "non_attente":
+        await ctx.send("Ce match n'est pas en attente.")
+    elif result[0] == "joueur_non_trouve":
+        await ctx.send(f"Le joueur {joueur2} n'est pas dans un match actif.")
+    elif result[0] == "match_accepte":
+        await ctx.send(f"Match entre {joueur1} et {joueur2} accepté, que le meilleur gagne!")
+    else:
+        await ctx.send("Une erreur est survenue lors de l'acceptation du match.")
 
 
 
 
+@bot.command(name="add")
+async def add(ctx):
+    match.create_match_test()
+    await ctx.send("simulation de match créée")
+
+@bot.command(name="del")
+async def delete(ctx):
+    match.delete_match_test()
+    await ctx.send("simulations des matchs supprimées")
 
 bot.run(BOT_TOKEN)
