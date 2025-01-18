@@ -246,6 +246,11 @@ async def leaderboard(ctx):
     else:
         await ctx.send(":x: Aucun joueur n'est enregistré dans la compétition")
 
+"""
+@bot.command(name="win")
+async def winner(ctx):
+    """
+
 
 @bot.command(name="add")
 async def add(ctx):
