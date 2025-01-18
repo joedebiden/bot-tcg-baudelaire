@@ -268,7 +268,7 @@ async def leaderboard(ctx):
 
 
 
-"""Enregistre le gagnant d'un match et met à jour l'état à 'terminé'"""
+"""Enregistre le gagnant d'un match et met à jour l'état à 'terminé' + manage l'elo"""
 @bot.command(name="win")
 async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
     joueur_actuel = ctx.author.name
@@ -304,12 +304,25 @@ async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
                 description=f"Le joueur `{gagnant_nom}` ne participe pas à ce match.",
                 color=discord.Color.red()))
             return
+        
+        perdant_nom = joueur1 if gagnant_nom == joueur2 else joueur2
 
         match.terminer_match(match_id, gagnant_nom)
+        gagnant_obj = elo_manager.obtenir_joueur(gagnant_nom)
+        perdant_obj = elo_manager.obtenir_joueur(perdant_nom)
+
+        if gagnant_obj is None or perdant_obj is None:
+            await ctx.send(embed=discord.Embed(
+                title="Erreur",
+                description="Impossible de trouver les informations des joueurs pour mettre à jour l'ELO.",
+                color=discord.Color.red()))
+            return
+
+        elo_manager.manage_elo(gagnant=gagnant_obj, perdant=perdant_obj, k=32)
 
         await ctx.send(embed=discord.Embed(
             title="Match Terminé 🎉",
-            description=f"Le joueur **{gagnant_nom}** a remporté le match !\n"
+            description=f"Le joueur **{gagnant_nom}** a remporté le match contre **{perdant_nom}** !\n"
                         f"Le match avec l'ID `{match_id}` est maintenant marqué comme **terminé**.",
             color=discord.Color.green()))
 
