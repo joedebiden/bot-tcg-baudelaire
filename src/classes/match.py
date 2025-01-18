@@ -66,7 +66,8 @@ class Match:
                     if requete[3] == 'en attente':
                         print(f"changement d'état du match pour : {requete[0]}")
                         self.db.execute("update matches set etat = 'en cours' where id = ?", (match_id,))
-                        return True
+                        return True, "Match accepté"
+                    
                     elif requete[3] == 'en cours':
                         return False, "un match est déjà en cours"
                     
@@ -92,8 +93,7 @@ class Match:
             requete = self.db.fetchone("select * FROM matches WHERE id = ?", (match_id,))
             print(f"[DEBUG] : {requete}")
             if requete:
-                print(f"le joueur ayant reçu la demande : {requete[2]}")
-                if requete[2] == joueur2:
+                if requete[2] == joueur2 or requete[1] == joueur2:
                     if requete[3] == 'en attente':
                         print(f"changement d'état du match pour : {requete[0]}")
                         self.db.execute("update matches set etat = 'refusé' where id = ?", (match_id,))
