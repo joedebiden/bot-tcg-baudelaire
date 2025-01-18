@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import sqlite3
 from dotenv import load_dotenv
 import os
 
@@ -151,14 +150,78 @@ async def declarer_match(ctx, adversaire: str = None):
 
 
 @bot.command(name="accepter")
-async def accepter_match(ctx, match_id: int):
-    result = match.accepter_match(match_id)
+async def accepter_match(ctx, match_id: int = None):
+    joueur2 = ctx.author.name
+    if match_id is None:
+        embed_error = discord.Embed(
+            title=":x: Erreur : ID du match manquant",
+            description="Veuillez fournir l'ID d'un match valide.\n"
+                        "Utilisation : `.accepter <id_du_match>`",
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
+        return
+    
+    result, message = match.accepter_match(match_id, joueur2)
+    if result == True:
+        embed_success = discord.Embed(
+            title=":white_check_mark: Match accepté",
+            description=f"Le match **#{match_id}** a été accepté avec succès !\n"
+                        f"Que le meilleur gagne ! 🏆",
+            color=discord.Color.green())
+        await ctx.send(embed=embed_success)
 
-    if result == True: 
-        await ctx.send("Match accepté")
     elif result == False:
-        await ctx.send("Le match est soit en cours ou terminé")
+        embed_warning = discord.Embed(
+            title=":warning: Match non disponible",
+            description=f"Vous ne pouvez pas accepter le match n°{match_id} car {message}",
+            color=discord.Color.orange())
+        await ctx.send(embed=embed_warning)
+    else:
+        embed_error = discord.Embed(
+            title=":x: Erreur",
+            description="Une erreur inconnue est survenue lors de l'acceptation du match.\n"
+                        "Veuillez réessayer ou contacter un administrateur.\n"
+                        f"Erreur : {message}",
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
 
+
+
+@bot.command(name="refuser")
+async def refuser_match(ctx, match_id: int = None):
+    joueur2 = ctx.author.name
+    if match_id is None:
+        embed_error = discord.Embed(
+            title=":x: Erreur : ID du match manquant",
+            description="Veuillez fournir l'ID d'un match valide.\n"
+                        "Utilisation : `.refuser <id_du_match>`",
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
+        return
+
+    result, message = match.refuser_match(match_id, joueur2)
+    if result == True:
+        embed_success = discord.Embed(
+            title=":white_check_mark: Match refusé",
+            description=f"Le match **#{match_id}** a été refusé avec succès.\n"
+                        "Vous pouvez toujours déclarer un nouveau match !",
+            color=discord.Color.green())
+        await ctx.send(embed=embed_success)
+
+    elif result == False:
+        embed_warning = discord.Embed(
+            title=":warning: Match non disponible",
+            description=f"Vous ne pouvez pas refuser le match n°{match_id} car {message}",
+            color=discord.Color.orange())
+        await ctx.send(embed=embed_warning)
+
+    else:
+        embed_error = discord.Embed(
+            title=":x: Erreur",
+            description="Une erreur inconnue est survenue lors du refus du match.\n"
+                        "Veuillez réessayer ou contacter un administrateur.",
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
 
 
 
