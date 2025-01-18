@@ -28,53 +28,126 @@ async def on_ready():
 async def on_close():
     db_manager = DatabaseManager()
     db_manager.close()
-    print("La base de donnée est fermée correctement")
 
 
-
-"""gere l'ajout d'un joueur"""
+"""création du joueur dans l'aventure (ne permet de s'ajouter que soi meme)"""
 @bot.command(name="start")
 async def ajouter_joueur(ctx):
     joueur = ctx.author.name
     try:
         elo_manager.ajouter_joueur(joueur)
-        await ctx.send(f"Bienvenue {joueur} dans l'aventure, tu as 1200 points à toi de monter dans le classement!")
+        embed = discord.Embed(
+            title=":sparkles: Bienvenue dans l'aventure ! :sparkles:",
+            description=f"**{joueur}**, tu as été ajouté à la compétition avec un score de départ de **1200 points Elo**.\n"
+                        "Prépare-toi à monter dans le classement et montre que tu es le meilleur !",
+            color=discord.Color.blue())
+        embed.set_thumbnail(url="")  # URL pour une icone de welcome (pas oublier !!!)
+        embed.set_footer(text="Bonne chance dans cette aventure compétitive !")
+        await ctx.send(embed=embed)
+
+# Gestion des erreurs (exemple : joueur déjà existant)
     except ValueError as e:
-        await ctx.send(str(e))
+        embed_error = discord.Embed(
+            title=":x: Erreur lors de l'inscription",
+            description=str(e),
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
 
 
 """Affiche info du joueur"""
 @bot.command(name="info")
-async def info_joueur(ctx, nom: str):
-    if not nom.strip():
-        await ctx.send("Fournissez un nom de joueur valide et existant dans la compétition")
+async def info_joueur(ctx, nom: str = None):
+    if not nom:
+        embed_error = discord.Embed(
+            title=":x: Erreur : Nom manquant",
+            description="Veuillez fournir un nom de joueur valide.\n"
+                        "Utilisation : `.info <nom_du_joueur>`",
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
         return
 
-    joueur = elo_manager.obtenir_joueur(nom)
-    if joueur:
-        await ctx.send(f"Joueur : {joueur.nom}\nELO : {joueur.elo}")
-    else:
-        await ctx.send("Fournissez un nom de joueur valide et existant dans la compétition")
+    try:
+        joueur = elo_manager.obtenir_joueur(nom)
+        if joueur:
+            embed = discord.Embed(
+                title=f":trophy: Informations sur le joueur {joueur.nom}",
+                color=discord.Color.gold())
+            embed.add_field(name="Nom du joueur", value=joueur.nom, inline=True)
+            embed.add_field(name="Score Elo", value=f"**{joueur.elo}** points", inline=True)
+            embed.set_footer(text="Lâche pas le grind !")
+            await ctx.send(embed=embed)
+        else:
+            embed_error = discord.Embed(
+                title=":x: Joueur introuvable",
+                description=f"Le joueur **{nom}** n'est pas enregistré dans la compétition",
+                color=discord.Color.red())
+            await ctx.send(embed=embed_error)
+
+    except ValueError as e:
+        embed_error = discord.Embed(
+            title=":x: Erreur interne",
+            description=str(e),
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
 
 
 """déclaration de match"""
 @bot.command(name="match")
-async def declarer_match(ctx, adversaire: str):
+async def declarer_match(ctx, adversaire: str = None):
     joueur1 = ctx.author.name
 
-    game = match.ajouter_match(joueur1, adversaire) # permet d'insérer le match dans la base (unique match par joueur)
-    if game == False:
-        await ctx.send("Un des deux joueurs participe déjà dans un match")
+    if not adversaire:
+        embed_error = discord.Embed(
+            title=":x: Erreur : Adversaire manquant",
+            description="Veuillez fournir un nom d'adversaire valide.\n"
+                        "Utilisation : `.match <nom_adversaire>`",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed_error)
         return
+
+    if adversaire == joueur1:
+        embed_error = discord.Embed(
+            title=":x: Erreur : Adversaire invalide",
+            description="Vous ne pouvez pas jouer contre vous-même !",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed_error)
+        return
+
+    game = match.ajouter_match(joueur1, adversaire)
+    if game == False:
+        embed_error = discord.Embed(
+            title=":x: Match non disponible",
+            description="Un des deux joueurs participe déjà à un match.\n"
+                        "Terminez votre match en cours avant d'en commencer un nouveau.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed_error)
+        return
+
     elif game == True:
         match_id = match.match_id(joueur1)
-        await ctx.send(f"Le match entre {joueur1} et {adversaire} est en cours d'attente.\n"
-                       f"ID du match pour pouvoir accepter/annuler la demande à tout moment : `{match_id}`\n"
-                       f"Utilise `.accepter {match_id}` pour accepter le match\n"
-                       f"Et `.refuser {match_id}` pour décliner la demande")
+
+        embed = discord.Embed(
+            title=":crossed_swords: Match créé avec succès !",
+            description=f"Le match entre **{joueur1}** et **{adversaire}** est en attente.",
+            color=discord.Color.blue())
+        embed.add_field(name="ID du match", value=f"`{match_id}`", inline=False)
+        embed.add_field(name="Instructions", value=(
+            f"- **Accepter le match** : `.accepter {match_id}`\n"
+            f"- **Refuser le match** : `.refuser {match_id}`"), inline=False)
+        embed.set_footer(text="Préparez-vous à vous affronter, que le meilleur gagne !")
+        await ctx.send(embed=embed)
+        return
 
     else:
-        await ctx.send("Une erreur est survenue lors de la création du match")
+        embed_error = discord.Embed(
+            title=":x: Erreur",
+            description="Une erreur inconnue est survenue lors de la création du match.",
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
+        return
 
 
 @bot.command(name="accepter")
@@ -87,13 +160,28 @@ async def accepter_match(ctx, match_id: int):
         await ctx.send("Le match est soit en cours ou terminé")
 
 
+
+
 @bot.command(name="leaderboard")
 async def leaderboard(ctx):
     leaderboard = elo_manager.classement()
     if leaderboard:
-        await ctx.send(leaderboard)
+        embed = discord.Embed(
+            title=":trophy: Classement des Joueurs :trophy:",
+            description="Voici les meilleurs joueurs de la compétition.",
+            color=discord.Color.gold())
+
+        for rank, name, score in leaderboard:
+            embed.add_field(
+                name=f"#{rank} - {name}",
+                value=f"Score Elo : **{score}**",
+                inline=False)
+
+        embed.set_footer(text="Ceci est le leaderboard officiel")
+        embed.set_thumbnail(url="") # url de l'image sur le serveur à mettre /!\ oublie pas !!
+        await ctx.send(embed=embed)
     else:
-        await ctx.send("Aucun joueur n'est enregistré dans la compétition")
+        await ctx.send(":x: Aucun joueur n'est enregistré dans la compétition")
 
 
 @bot.command(name="add")
