@@ -116,11 +116,27 @@ class Match:
             return False, str(e)
 
 
+    """Retourne les informations d'un match à partir de son ID."""
+    def obtenir_match(self, match_id):
+        requete = "SELECT etat, joueur1, joueur2 FROM matches WHERE id = ?"
+        result = self.db.fetchone(requete, (match_id,))
+        if result:
+            return result 
+        return None
+    
+    """Met à jour l'état d'un match à 'terminé' et enregistre le gagnant."""
+    def terminer_match(self, match_id, gagnant):
+        try:    
+            requete = """update matches set etat = 'terminé', gagnant = ? where id = ? and etat = 'en cours'"""
+            self.db.execute(requete, (gagnant, match_id))
+        except sqlite3.InternalError as e:
+            print(f"Une erreur est survenue: {e}")
+
 
 
     def create_match_test(self):
         try:
-            self.db.execute("insert into matches (joueur1, joueur2, etat) values ('oui', 'bode', 'en attente')")
+            self.db.execute("insert into matches (joueur1, joueur2, etat) values ('Xavier', 'bodelaire', 'en attente')")
             print("Match test added")
         except sqlite3.InternalError as e:
             print(f"Une erreur est survenue: {e}")

@@ -257,10 +257,59 @@ async def leaderboard(ctx):
     else:
         await ctx.send(":x: Aucun joueur n'est enregistré dans la compétition")
 
-"""
+
+
+"""Enregistre le gagnant d'un match et met à jour l'état à 'terminé'"""
 @bot.command(name="win")
-async def winner(ctx):
-    """
+async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
+    joueur_actuel = ctx.author.name
+
+    try:
+        match_data = match.obtenir_match(match_id)
+
+        if not match_data:
+            await ctx.send(embed=discord.Embed(
+                title="Erreur",
+                description=f"Le match avec l'ID `{match_id}` n'existe pas.",
+                color=discord.Color.red()))
+            return
+
+        etat, joueur1, joueur2 = match_data
+        if etat != "en cours":
+            await ctx.send(embed=discord.Embed(
+                title="Match non valide",
+                description=f"Le match avec l'ID `{match_id}` n'est pas en cours.",
+                color=discord.Color.orange()))
+            return
+
+        if joueur_actuel not in [joueur1, joueur2]:
+            await ctx.send(embed=discord.Embed(
+                title="Permission refusée",
+                description="Vous ne participez pas à ce match.",
+                color=discord.Color.red()))
+            return
+
+        if gagnant_nom not in [joueur1, joueur2]:
+            await ctx.send(embed=discord.Embed(
+                title="Erreur",
+                description=f"Le joueur `{gagnant_nom}` ne participe pas à ce match.",
+                color=discord.Color.red()))
+            return
+
+        match.terminer_match(match_id, gagnant_nom)
+
+        await ctx.send(embed=discord.Embed(
+            title="Match Terminé 🎉",
+            description=f"Le joueur **{gagnant_nom}** a remporté le match !\n"
+                        f"Le match avec l'ID `{match_id}` est maintenant marqué comme **terminé**.",
+            color=discord.Color.green()))
+
+    except Exception as e:
+        await ctx.send(embed=discord.Embed(
+            title="Erreur inattendue",
+            description=str(e),
+            color=discord.Color.red()))
+
 
 
 @bot.command(name="add")
