@@ -81,20 +81,11 @@ async def declarer_match(ctx, adversaire: str):
 async def accepter_match(ctx, match_id: int):
     result = match.accepter_match(match_id)
 
-    if result is None:
-        await ctx.send("Match non trouvé.")
-        return
+    if result == True: 
+        await ctx.send("Match accepté")
+    elif result == False:
+        await ctx.send("Le match est soit en cours ou terminé")
 
-    etat, joueur1, joueur2 = result[1:] if isinstance(result, tuple) else (None, None, None)
-
-    if result[0] == "non_attente":
-        await ctx.send("Ce match n'est pas en attente.")
-    elif result[0] == "joueur_non_trouve":
-        await ctx.send(f"Le joueur {joueur2} n'est pas dans un match actif.")
-    elif result[0] == "match_accepte":
-        await ctx.send(f"Match entre {joueur1} et {joueur2} accepté, que le meilleur gagne!")
-    else:
-        await ctx.send("Une erreur est survenue lors de l'acceptation du match.")
 
 
 

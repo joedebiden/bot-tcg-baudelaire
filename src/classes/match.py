@@ -49,44 +49,37 @@ class Match:
             print(f"Une erreur est survenue: {e}")
             return None
 
-    def accepter_match(self, match_id, joueur2):
+
+    def accepter_match(self, match_id):
         """
-        requête recherchant le joueur2 (donc celui qui a reçu la demande de match)
-        check le joueur qui a lancé la commande est dans un match
-        si oui check si le match est en attente
-        si le match est en cours ou finit alors leve une erreur
-        enfin si tous les tests passent et modifient l'état du match
+        requete qui prend l'id du match en paramètre, recherche le joueur2 et le status du match
+        donc évidemment si c'est en attente alors le match est accepté sinon les conditions font que le match ne peut pas être accepté
         """
         try:
-            match_look = self.db.fetchone("select joueur2, etat FROM matches WHERE id = ?", (match_id,))
-            if match_look:
-                print(f"le joueur ayant reçu la demande : {match_look[0]}")
-                if match_look[1] == 'en attente':
-                    print(f"changement d'état du match pour : {match_look[0]}")
-                    self.db.execute("update matches set etat = 'en cours' where joueur2 = '?'", (joueur2,))
+            requete = self.db.fetchone("select * FROM matches WHERE id = ?", (match_id,))
+            print(f"[DEBUG] : {requete}")
+            if requete:
+                print(f"le joueur ayant reçu la demande : {requete[2]}")
+                if requete[3] == 'en attente':
+                    print(f"changement d'état du match pour : {requete[0]}")
+                    self.db.execute("update matches set etat = 'en cours' where id = ?", (match_id,))
                     return True
-                elif match_look[1] == 'en cours':
+                elif requete[3] == 'en cours':
                     print("un match est déjà en cours")
                     return False
-                elif match_look[1] == 'terminé':
+                elif requete[3] == 'terminé':
                     print("le match est déjà terminé")
                     return False
                 else:
                     print("une erreur inconnu")
-
             else:
                 print("le joueur n'est enregistré dans aucun combat")
                 return False
 
         except sqlite3.InternalError as e:
             print(f"Une erreur est survenue: {e}")
+            return False
 
-    def update_match(self, match_id):
-        try:
-            self.db.execute("UPDATE matches SET etat = 'en cours' WHERE id = ?", (match_id,))
-            print(f"Match ")
-        except sqlite3.InternalError as e:
-            print(f"Une erreur est survenue: {e}")
 
 
 
