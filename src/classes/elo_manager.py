@@ -48,3 +48,7 @@ class EloManager:
         perdant.elo += round(k * (0 - proba_perdant))
         self.update_elo(gagnant)
         self.update_elo(perdant)
+
+
+    def classement(self):
+        return self.db.fetchall("select * from joueurs order by elo desc")

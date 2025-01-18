@@ -87,7 +87,13 @@ async def accepter_match(ctx, match_id: int):
         await ctx.send("Le match est soit en cours ou terminé")
 
 
-
+@bot.command(name="leaderboard")
+async def leaderboard(ctx):
+    leaderboard = elo_manager.classement()
+    if leaderboard:
+        await ctx.send(leaderboard)
+    else:
+        await ctx.send("Aucun joueur n'est enregistré dans la compétition")
 
 
 @bot.command(name="add")
