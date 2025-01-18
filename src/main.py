@@ -308,6 +308,7 @@ async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
         perdant_nom = joueur1 if gagnant_nom == joueur2 else joueur2
 
         match.terminer_match(match_id, gagnant_nom)
+
         gagnant_obj = elo_manager.obtenir_joueur(gagnant_nom)
         perdant_obj = elo_manager.obtenir_joueur(perdant_nom)
 
@@ -318,12 +319,14 @@ async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
                 color=discord.Color.red()))
             return
 
-        elo_manager.manage_elo(gagnant=gagnant_obj, perdant=perdant_obj, k=32)
+        elo_change_gagnant, elo_change_perdant = elo_manager.manage_elo(gagnant=gagnant_obj, perdant=perdant_obj, k=32)
 
         await ctx.send(embed=discord.Embed(
             title="Match Terminé 🎉",
             description=f"Le joueur **{gagnant_nom}** a remporté le match contre **{perdant_nom}** !\n"
-                        f"Le match avec l'ID `{match_id}` est maintenant marqué comme **terminé**.",
+                        f"Le match avec l'ID `{match_id}` est maintenant marqué comme **terminé**.\n"
+                        f"**{gagnant_nom}** a gagné {elo_change_gagnant:.2f} ELO.\n"
+                        f"**{perdant_nom}** a perdu {elo_change_perdant:.2f} ELO.",
             color=discord.Color.green()))
 
     except Exception as e:

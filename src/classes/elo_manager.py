@@ -44,10 +44,16 @@ class EloManager:
         proba_gagnant = 1 / (1 + 10 ** ((perdant.elo - gagnant.elo) / 400))
         proba_perdant = 1 - proba_gagnant
 
-        gagnant.elo += round(k * (1 - proba_gagnant))
-        perdant.elo += round(k * (0 - proba_perdant))
+        elo_change_gagnant = k * (1 - proba_gagnant)
+        elo_change_perdant = k * (0 - proba_perdant)
+
+        gagnant.elo += round(elo_change_gagnant)
+        perdant.elo += round(elo_change_perdant)
+
         self.update_elo(gagnant)
         self.update_elo(perdant)
+
+        return elo_change_perdant, elo_change_gagnant
 
 
     def classement(self):
