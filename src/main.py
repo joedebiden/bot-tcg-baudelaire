@@ -111,8 +111,17 @@ async def declarer_match(ctx, adversaire: str = None):
             title=":x: Erreur : Joueur introuvable",
             description="Vous n'êtes pas enregistré dans la compétition.\n"
                         "Commencez par vous inscrire avec la commande `.start`",
-            color=discord.Color.red()
-        )
+            color=discord.Color.red())
+        await ctx.send(embed=embed_error)
+        return
+    
+    adversaire_obj = elo_manager.obtenir_joueur(adversaire)
+    if adversaire_obj is None:
+        embed_error = discord.Embed(
+            title=":x: Erreur : Adversaire introuvable",
+            description=f"Le joueur **{adversaire}** n'est pas enregistré dans la compétition.\n"
+                        "Veuillez vérifier le nom de l'adversaire et réessayer.",
+            color=discord.Color.red())
         await ctx.send(embed=embed_error)
         return
 
