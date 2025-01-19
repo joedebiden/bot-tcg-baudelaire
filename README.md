@@ -47,33 +47,33 @@ python main.py
 
 ### Available commands
 
-1. **Starting the adventure **
-- Command: `.start`
-- Description: Adds the current user to the competition with an initial Elo score of 1200.
+1. **Starting the adventure**
+    - Command: `.start`
+    - Description: Adds the current user to the competition with an initial Elo score of 1200.
 
 2. **Player Information**
-- Command: `.info <name>`
-- Description: Displays a player's information (name and Elo score).
+    - Command: `.info <name>`
+    - Description: Displays a player's information (name and Elo score).
 
 3. **Declare a Match**
-- Command: `.match <opponent_name>`
-- Description: Declares a match between the user and an opponent.
+    - Command: `.match <opponent_name>`
+    - Description: Declares a match between the user and an opponent.
 
 4. **Accept a Match**
-- Command: `.accepter <match_id>`
-- Description: Accepts a pending match.
+    - Command: `.accepter <match_id>`
+    - Description: Accepts a pending match.
 
 5. **Decline a Match**
-- Command: `.refuser <match_id>`
-- Description: Declines a pending match.
+    - Command: `.refuser <match_id>`
+    - Description: Declines a pending match.
 
 6. **Register a Winner**
-- Command: `.win <match_id> <winner_name>`
-- Description: Records the winner of a match and updates the Elo scores.
+    - Command: `.win <match_id> <winner_name>`
+    - Description: Records the winner of a match and updates the Elo scores.
 
 7. **Show the Leaderboard**
-- Command: `.leaderboard`
-- Description: Displays the current leaderboard sorted by Elo scores.
+    - Command: `.leaderboard`
+    - Description: Displays the current leaderboard sorted by Elo scores.
 
 ## Database
 
