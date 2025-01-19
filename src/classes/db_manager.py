@@ -8,8 +8,10 @@ class DatabaseManager:
     def __new__(cls, db_path="db/elo_database.db"):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))	
-            full_path = os.path.join(base_dir,'..', db_path)
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+            full_path = os.path.join(base_dir, db_path)
+            if not os.path.exists(full_path):
+                raise FileNotFoundError(f"Le fichier de base de données est introuvable : {full_path}")
             cls._instance.conn = sqlite3.connect(full_path, check_same_thread=False)
             cls._instance.cursor = cls._instance.conn.cursor()
         return cls._instance
