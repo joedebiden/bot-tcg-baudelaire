@@ -1,1 +1,18 @@
 le but est de pouvoir déclarer un combat, la demande passera dans un état d'attente il suffit qu'un .accepte {le nom de la personne qui propose le combat}, pour qu'une fois le combat accepté alors celui ci passera dans un autre etat qui celui d'etre en cours, à partir de n'importe quel moment le combat peut etre marqué comme fini par un .end {id} et enfin le bot demandera le résultat avec une interface graphique dans discord, le résultat du combat sera stocké dans la base de donnée
+
+.info -> affiche la classe
+gestion elo -> trie la classe
+Gestion classe : 
+ 
+0-1000 : noob classe
+1001-1300 : normale classe
+1301-1500 : super classe
+1501-1700 : hyper classe
+1701-2000 : master classe
+2001-top(5) : champion
+
+
+Win : Point avant + nbr carte récompence jouer * 10 * écart carte restante  + 4 X (6-nbr de carte restant lose )
+Lose : Point avant + nbr carte récompence jouer X 2 X (6-nbr carte lose ) + 10
+
+Si égalité : nbr de carte lose X 10
