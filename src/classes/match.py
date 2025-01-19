@@ -131,19 +131,3 @@ class Match:
             self.db.execute(requete, (gagnant, match_id))
         except sqlite3.InternalError as e:
             print(f"Une erreur est survenue: {e}")
-
-
-
-    def create_match_test(self):
-        try:
-            self.db.execute("insert into matches (joueur1, joueur2, etat) values ('Xavier', 'bodelaire', 'en attente')")
-            print("Match test added")
-        except sqlite3.InternalError as e:
-            print(f"Une erreur est survenue: {e}")
-
-    def delete_match_test(self):
-        try:
-            self.db.execute("delete from matches where (joueur1 = 'bodelaire' or joueur2 = 'bodelaire')")
-            print("matches tests deleted")
-        except sqlite3.InternalError as e:
-            print(f"Une erreur est survenue: {e}")

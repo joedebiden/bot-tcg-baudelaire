@@ -336,15 +336,4 @@ async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
             color=discord.Color.red()))
 
 
-
-@bot.command(name="add")
-async def add(ctx):
-    match.create_match_test()
-    await ctx.send("simulation de match créée")
-
-@bot.command(name="del")
-async def delete(ctx):
-    match.delete_match_test()
-    await ctx.send("simulations des matchs supprimées")
-
 bot.run(BOT_TOKEN)
