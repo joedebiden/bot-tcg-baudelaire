@@ -336,4 +336,19 @@ async def enregistrer_gagnant(ctx, match_id: int, gagnant_nom: str):
             color=discord.Color.red()))
 
 
+
+@bot.command(name="reset")
+async def reset_rank(ctx):
+    joueur = ctx.author.name
+
+    if elo_manager.is_admin(joueur) == True:
+        elo_manager.rank_reset()
+        await ctx.send("Tous les elos de chaque joueur à été reset!")
+        return
+    else:
+        await ctx.send("Vous n'avez pas les permissions pour reset les elos de tout le monde!")
+        return
+
+
+
 bot.run(BOT_TOKEN)

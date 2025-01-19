@@ -13,7 +13,8 @@ class EloManager:
         CREATE TABLE IF NOT EXISTS joueurs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nom TEXT UNIQUE NOT NULL,
-            elo INTEGER NOT NULL DEFAULT 1200
+            elo INTEGER NOT NULL DEFAULT 1200,
+            role TEXT
         )
         """)
 
@@ -58,3 +59,17 @@ class EloManager:
 
     def classement(self):
         return self.db.fetchall("select * from joueurs order by elo desc")
+    
+    def is_admin(self, joueur):
+        try:
+            requete = self.db.fetchall("select role from joueurs where joueur = ?", (joueur,))
+            if requete[0] == 'admin':
+                return True
+            else:
+                return False
+        except sqlite3.InternalError:
+            print("Une erreur est survenue")
+
+    def rank_reset(self):
+        self.db.execute("delete elo from joueurs")
+        

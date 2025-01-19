@@ -16,3 +16,8 @@ Win : Point avant + nbr carte récompence jouer * 10 * écart carte restante  + 
 Lose : Point avant + nbr carte récompence jouer X 2 X (6-nbr carte lose ) + 10
 
 Si égalité : nbr de carte lose X 10
+
+====================
+
+role joueur : 
+admin - acces au chgmt de role, reset
