@@ -37,10 +37,11 @@ class Match:
             print(f"Une erreur est survenue: {e}")
 
 
+    # bug fixed 
     def match_id(self, joueur1):
-        """retourne l'id du match en fonction du joueur (implique un match max par joueur)"""
+        """retourne l'id du match le plus récente en fonction du joueur (implique un match max par joueur)"""
         try:
-            match_id = self.db.fetchone("select id from matches where joueur1 = ?", (joueur1,))
+            match_id = self.db.fetchone("select id from matches where joueur1 = ? order by id desc limit 1", (joueur1,))
             if match_id:
                 print(match_id[0])
                 return match_id[0]
